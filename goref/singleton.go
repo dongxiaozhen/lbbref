@@ -37,7 +37,11 @@ func init() {
 func hitPoint() {
 	t := time.NewTicker(1 * time.Second)
 	for range t.C {
-		data, _ := json.MarshalIndent(GetSnapshot().Data, "", "  ")
+		s := GetSnapshot().Data
+		if len(s) <= 0 {
+			continue
+		}
+		data, _ := json.MarshalIndent(s, "", "  ")
 		logger.Warn(string(data))
 	}
 }

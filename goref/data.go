@@ -29,7 +29,7 @@ func newData(src *data) Data {
 	return Data{
 		Active:   src.active,
 		Count:    src.count,
-		Duration: time.Duration(src.nsec) * time.Nanosecond,
+		Duration: time.Duration(src.nsec) * time.Nanosecond / time.Second,
 		AvgMsec:  float32(avgMsec),
 	}
 }
