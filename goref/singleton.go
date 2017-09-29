@@ -2,10 +2,16 @@ package goref
 
 import (
 	"encoding/json"
+	"sync"
+	"test/consul2/lbbconsul"
 	"time"
 
+	"github.com/dongxiaozhen/lbbutil"
 	"github.com/donnie4w/go-logger/logger"
 )
+
+var ConsulKey = make(map[string]bool)
+var mutex sync.Mutex
 
 // singleton GoRef instance
 var instance = NewGoRef()
@@ -43,5 +49,23 @@ func hitPoint() {
 		}
 		data, _ := json.MarshalIndent(s, "", "  ")
 		logger.Warn(string(data))
+		for k := range ConsulKey {
+			if d, ok := s[k]; ok {
+				count := lbbutil.Int64ToString(d.Count)
+				lbbconsul.GConsulClient.PutKV(k, []byte(count))
+			}
+		}
 	}
+}
+
+func SetConsulKey(key string) {
+	mutex.Lock()
+	ConsulKey[key] = true
+	mutex.Unlock()
+}
+
+func DelConsulKey(key string) {
+	mutex.Lock()
+	delete(ConsulKey, key)
+	mutex.Unlock()
 }
